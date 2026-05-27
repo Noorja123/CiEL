@@ -1,6 +1,23 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
+// Helper to check if a section is in view
+function useSectionInView(sectionId: string) {
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    function onScroll() {
+      const section = document.getElementById(sectionId.replace('#', ''));
+      if (!section) return setInView(false);
+      const rect = section.getBoundingClientRect();
+      // Section is in view if its top is above 120px and bottom is below 120px (header height)
+      setInView(rect.top <= 120 && rect.bottom > 120);
+    }
+    window.addEventListener('scroll', onScroll);
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [sectionId]);
+  return inView;
+}
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { Menu, X } from "lucide-react"
@@ -48,15 +65,19 @@ export function Header() {
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center gap-8">
-              {navItems.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className="text-sm font-medium text-foreground/80 hover:text-gold transition-colors duration-200"
-                >
-                  {item.name}
-                </Link>
-              ))}
+              {navItems.map((item) => {
+                const inView = typeof window !== 'undefined' ? useSectionInView(item.href) : false;
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={`text-sm font-medium transition-colors duration-200 
+                      ${inView ? 'font-bold text-gold border-b-2 border-gold pb-1' : 'text-foreground/80 hover:text-gold'}`}
+                  >
+                    {item.name}
+                  </Link>
+                );
+              })}
             </nav>
 
             <div className="hidden lg:flex items-center gap-4">
@@ -97,22 +118,25 @@ export function Header() {
             className="fixed inset-0 z-40 bg-white pt-24 px-6 lg:hidden"
           >
             <nav className="flex flex-col gap-6">
-              {navItems.map((item, index) => (
-                <motion.div
-                  key={item.name}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <Link
-                    href={item.href}
-                    className="text-2xl font-serif text-foreground hover:text-gold transition-colors"
-                    onClick={() => setIsMobileMenuOpen(false)}
+              {navItems.map((item, index) => {
+                const inView = typeof window !== 'undefined' ? useSectionInView(item.href) : false;
+                return (
+                  <motion.div
+                    key={item.name}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
                   >
-                    {item.name}
-                  </Link>
-                </motion.div>
-              ))}
+                    <Link
+                      href={item.href}
+                      className={`text-2xl font-serif transition-colors ${inView ? 'font-bold text-gold' : 'text-foreground hover:text-gold'}`}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      {item.name}
+                    </Link>
+                  </motion.div>
+                );
+              })}
               <div className="flex flex-col gap-4 mt-8">
                 <Button 
                   variant="outline" 
