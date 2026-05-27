@@ -145,19 +145,19 @@ export function ContactSection() {
                 <div className="p-1.5 rounded-md bg-gold/10">
                   <Mail className="h-3.5 w-3.5 text-gold" />
                 </div>
-                <span className="text-xs text-muted-foreground">contact@ciel.edu</span>
+                <span className="text-xs text-muted-foreground">email@ciel.edu</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="p-1.5 rounded-md bg-gold/10">
                   <Phone className="h-3.5 w-3.5 text-gold" />
                 </div>
-                <span className="text-xs text-muted-foreground">+91 98765 43210</span>
+                <span className="text-xs text-muted-foreground">+91 XXXXXXXX</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="p-1.5 rounded-md bg-gold/10">
                   <MapPin className="h-3.5 w-3.5 text-gold" />
                 </div>
-                <span className="text-xs text-muted-foreground">Innovation Hub</span>
+                <span className="text-xs text-muted-foreground">Chetana's Innovation Hub</span>
               </div>
             </div>
           </motion.div>
