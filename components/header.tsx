@@ -45,6 +45,11 @@ export function Header() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
+  // Compute inView for each navItem only once, outside of render loops
+  const navInView = navItems.map((item) =>
+    typeof window !== 'undefined' ? useSectionInView(item.href) : false
+  );
+
   return (
     <>
       <motion.header
@@ -65,19 +70,16 @@ export function Header() {
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center gap-8">
-              {navItems.map((item) => {
-                const inView = typeof window !== 'undefined' ? useSectionInView(item.href) : false;
-                return (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className={`text-sm font-medium transition-colors duration-200 
-                      ${inView ? 'font-bold text-gold border-b-2 border-gold pb-1' : 'text-foreground/80 hover:text-gold'}`}
-                  >
-                    {item.name}
-                  </Link>
-                );
-              })}
+              {navItems.map((item, idx) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={`text-sm font-medium transition-colors duration-200 
+                    ${navInView[idx] ? 'font-bold text-gold border-b-2 border-gold pb-1' : 'text-foreground/80 hover:text-gold'}`}
+                >
+                  {item.name}
+                </Link>
+              ))}
             </nav>
 
             <div className="hidden lg:flex items-center gap-4">
@@ -118,25 +120,22 @@ export function Header() {
             className="fixed inset-0 z-40 bg-white pt-24 px-6 lg:hidden"
           >
             <nav className="flex flex-col gap-6">
-              {navItems.map((item, index) => {
-                const inView = typeof window !== 'undefined' ? useSectionInView(item.href) : false;
-                return (
-                  <motion.div
-                    key={item.name}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
+              {navItems.map((item, index) => (
+                <motion.div
+                  key={item.name}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Link
+                    href={item.href}
+                    className={`text-2xl font-serif transition-colors ${navInView[index] ? 'font-bold text-gold' : 'text-foreground hover:text-gold'}`}
+                    onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    <Link
-                      href={item.href}
-                      className={`text-2xl font-serif transition-colors ${inView ? 'font-bold text-gold' : 'text-foreground hover:text-gold'}`}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      {item.name}
-                    </Link>
-                  </motion.div>
-                );
-              })}
+                    {item.name}
+                  </Link>
+                </motion.div>
+              ))}
               <div className="flex flex-col gap-4 mt-8">
                 <Button 
                   variant="outline" 
